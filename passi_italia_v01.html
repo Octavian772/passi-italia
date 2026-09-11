@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Passi d'Italia – Moto Supersportive</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html,body,#map{height:100%;margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#111}
+#map{position:absolute;inset:0}
+.header{position:absolute;z-index:1000;top:14px;left:14px;right:14px;background:rgba(18,18,18,.93);color:#fff;padding:12px 14px;border-radius:16px;box-shadow:0 4px 20px #0005}
+.title{font-weight:800;font-size:18px}.sub{font-size:12px;color:#bbb;margin-top:2px}
+.legend{position:absolute;z-index:1000;left:14px;bottom:20px;background:rgba(18,18,18,.94);color:#fff;padding:10px 12px;border-radius:14px;font-size:13px;box-shadow:0 4px 20px #0005}
+.row{display:flex;align-items:center;margin:6px 0;cursor:pointer}.dot{width:13px;height:13px;border-radius:50%;margin-right:8px;border:2px solid #fff}
+.note{font-size:10px;color:#aaa;max-width:260px;margin-top:8px;line-height:1.25}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#171717;color:#fff}
+.btn{display:inline-block;margin-top:8px;padding:7px 10px;background:#fff;color:#111;text-decoration:none;border-radius:8px;font-weight:700}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="header"><div class="title">🏍️ PASSI D'ITALIA</div><div class="sub">Prima versione reale • Futa · Raticosa · Giogo · Muraglione</div></div>
+<div class="legend">
+ <div class="row" onclick="focusPass('futa')"><span class="dot" style="background:#ffd400"></span>Futa</div>
+ <div class="row" onclick="focusPass('raticosa')"><span class="dot" style="background:#ff7a00"></span>Raticosa</div>
+ <div class="row" onclick="focusPass('giogo')"><span class="dot" style="background:#16c784"></span>Giogo</div>
+ <div class="row" onclick="focusPass('muraglione')"><span class="dot" style="background:#9b5cff"></span>Muraglione</div>
+ <div class="note">Versione 0.1: mappa vera, zoomabile e cliccabile. I tracciati colorati sono una prima approssimazione e verranno sostituiti con geometrie stradali verificate.</div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map=L.map('map',{zoomControl:true}).setView([44.05,11.43],10);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+
+const passes={
+futa:{name:'Passo della Futa',color:'#ffd400',alt:'903 m',road:'SS65',summit:[44.0962,11.2753],
+ pts:[[44.052,11.237],[44.064,11.247],[44.078,11.257],[44.088,11.268],[44.0962,11.2753],[44.107,11.286],[44.121,11.298]]},
+raticosa:{name:'Passo della Raticosa',color:'#ff7a00',alt:'968 m',road:'SS65',summit:[44.151,11.337],
+ pts:[[44.121,11.298],[44.132,11.310],[44.143,11.324],[44.151,11.337],[44.161,11.348],[44.171,11.358]]},
+giogo:{name:'Passo del Giogo',color:'#16c784',alt:'882 m',road:'SP503',summit:[44.002,11.388],
+ pts:[[43.987,11.292],[43.992,11.316],[43.998,11.342],[44.003,11.365],[44.002,11.388],[44.008,11.412],[44.021,11.435]]},
+muraglione:{name:'Passo del Muraglione',color:'#9b5cff',alt:'907 m',road:'SS67',summit:[43.941,11.656],
+ pts:[[43.910,11.576],[43.921,11.602],[43.932,11.628],[43.941,11.656],[43.951,11.681],[43.964,11.706]]}
+};
+const layers={};
+for(const [id,p] of Object.entries(passes)){
+ const line=L.polyline(p.pts,{color:p.color,weight:7,opacity:.9}).addTo(map);
+ const marker=L.circleMarker(p.summit,{radius:8,color:'#fff',weight:2,fillColor:p.color,fillOpacity:1}).addTo(map);
+ const q=encodeURIComponent(p.summit.join(','));
+ const popup=`<b>${p.name}</b><br>${p.alt} • ${p.road}<br><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${q}">Apri navigazione</a>`;
+ line.bindPopup(popup); marker.bindPopup(popup);
+ layers[id]=L.featureGroup([line,marker]);
+}
+function focusPass(id){map.fitBounds(layers[id].getBounds(),{padding:[45,45]});}
+</script>
+</body></html>
