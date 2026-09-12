@@ -184,7 +184,7 @@ L.tileLayer(
   }
 ).addTo(map);
 
-const async function highlightMotorways(){
+async function highlightMotorways(){
   const query=
     '[out:json][timeout:25];' +
     'way["highway"~"^(motorway|motorway_link)$"]' +
@@ -223,7 +223,7 @@ const async function highlightMotorways(){
   }
 }
 
-highlightMotorways();
+  const passes={
 
   futa:{
     name:"Passo della Futa",
