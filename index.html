@@ -1,181 +1,105 @@
 <!doctype html>
-
 <html lang="it">
-
 <head>
-
 <meta charset="utf-8">
-
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-
 <title>Passi d'Italia – Moto Supersportive</title>
 
 <link rel="stylesheet"
-
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
-
 html,body,#map{
-
   height:100%;
-
   margin:0;
-
 }
 
 body{
-
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-
   background:#111;
-
 }
 
 #map{
-
   position:absolute;
-
   inset:0;
-
 }
 
 .header{
-
   position:absolute;
-
   z-index:1000;
-
   top:14px;
-
   left:14px;
-
   right:14px;
-
   background:rgba(18,18,18,.94);
-
   color:white;
-
   padding:12px 14px;
-
   border-radius:16px;
-
   box-shadow:0 4px 20px #0005;
-
 }
 
 .title{
-
   font-weight:800;
-
   font-size:18px;
-
 }
 
 .sub{
-
   font-size:12px;
-
   color:#bbb;
-
   margin-top:3px;
-
 }
 
 .legend{
-
   position:absolute;
-
   z-index:1000;
-
   left:14px;
-
   bottom:22px;
-
   background:rgba(18,18,18,.94);
-
   color:white;
-
   padding:10px 13px;
-
   border-radius:14px;
-
   font-size:13px;
-
   box-shadow:0 4px 20px #0005;
-
 }
 
 .row{
-
   display:flex;
-
   align-items:center;
-
   margin:7px 0;
-
   cursor:pointer;
-
 }
 
 .dot{
-
   width:13px;
-
   height:13px;
-
   border-radius:50%;
-
   margin-right:8px;
-
   border:2px solid white;
-
 }
 
 .status{
-
   font-size:10px;
-
   color:#aaa;
-
   margin-top:7px;
-
   max-width:260px;
-
 }
 
 .leaflet-popup-content-wrapper,
-
 .leaflet-popup-tip{
-
   background:#171717;
-
   color:white;
-
 }
 
 .btn{
-
   display:inline-block;
-
   margin-top:8px;
-
   padding:7px 10px;
-
   background:white;
-
   color:#111 !important;
-
   text-decoration:none;
-
   border-radius:8px;
-
   font-weight:700;
-
 }
-
 </style>
-
 </head>
 
 <body>
@@ -183,361 +107,312 @@ body{
 <div id="map"></div>
 
 <div class="header">
-
   <div class="title">🏍️ PASSI D'ITALIA</div>
-
   <div class="sub">
-
     Moto Supersportive • Futa · Raticosa · Giogo · Muraglione
-
   </div>
-
 </div>
 
 <div class="legend">
 
-<div class="row" onclick="focusPass('futa')">
+  <div class="row" onclick="focusPass('futa')">
+    <span class="dot" style="background:#00C853"></span>
+    Passo della Futa
+  </div>
 
-<span class="dot" style="background:#FFD400"></span>
+  <div class="row" onclick="focusPass('raticosa')">
+    <span class="dot" style="background:#00C853"></span>
+    Passo della Raticosa
+  </div>
 
-Passo della Futa
+  <div class="row" onclick="focusPass('giogo')">
+    <span class="dot" style="background:#16C784"></span>
+    Passo del Giogo
+  </div>
 
-</div>
+  <div class="row" onclick="focusPass('muraglione')">
+    <span class="dot" style="background:#9B5CFF"></span>
+    Passo del Muraglione
+  </div>
 
-<div class="row" onclick="focusPass('raticosa')">
-
-<span class="dot" style="background:#FF7A00"></span>
-
-Passo della Raticosa
-
-</div>
-
-<div class="row" onclick="focusPass('giogo')">
-
-<span class="dot" style="background:#16C784"></span>
-
-Passo del Giogo
-
-</div>
-
-<div class="row" onclick="focusPass('muraglione')">
-
-<span class="dot" style="background:#9B5CFF"></span>
-
-Passo del Muraglione
-
-</div>
-
-<div class="status" id="status">
-
-Caricamento dei percorsi stradali…
-
-</div>
+  <div class="status" id="status">
+    Caricamento dei percorsi stradali…
+  </div>
 
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-
-const map = L.map('map').setView([44.05,11.43],10);
+const map=L.map("map").setView([44.05,11.43],10);
 
 L.tileLayer(
-
-'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-
-{
-
-  maxZoom:19,
-
-  attribution:'© OpenStreetMap contributors'
-
-}
-
+  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom:19,
+    attribution:"© OpenStreetMap contributors"
+  }
 ).addTo(map);
 
-/*
+const passes={
+  futa:{
+    name:"Passo della Futa",
+    color:"#00C853",
+    altitude:"903 m",
+    road:"SS65",
+    summit:[44.0962,11.2753]
+  },
 
- I punti sotto servono al motore di routing
+  raticosa:{
+    name:"Passo della Raticosa",
+    color:"#00C853",
+    altitude:"968 m",
+    road:"SS65",
+    summit:[44.1510,11.3370]
+  },
 
- per calcolare il percorso lungo le strade.
+  giogo:{
+    name:"Passo del Giogo",
+    color:"#16C784",
+    altitude:"882 m",
+    road:"SP503",
+    summit:[44.0020,11.3880],
+    waypoints:[
+      [43.9910,11.3540],
+      [44.0020,11.3880],
+      [44.1100,11.3780]
+    ]
+  },
 
-*/
-
-const passes = {
-
-futa:{
-
- name:"Passo della Futa",
-
- color:"#FFD400",
-
- altitude:"903 m",
-
- road:"SS65",
-
- summit:[44.0962,11.2753],
-
- // Covigliaio → Futa → Montecarelli
-waypoints:[
-  [44.1270,11.2710],
-  [44.1120,11.2705],
-  [44.0962,11.2753],
-  [44.0830,11.2800],
-  [44.0670,11.2830],
-
-  [44.0410,11.2850]
-]
- 
-
-},
-
-raticosa:{
-
- name:"Passo della Raticosa",
-
- color:"#FF7A00",
-
- altitude:"968 m",
-
- road:"SS65",
-
- summit:[44.1510,11.3370],
-
- waypoints:[
-
-  [44.0962,11.2753],
-
-  [44.1510,11.3370],
-
-  [44.1900,11.3900]
-
- ]
-
-},
-
-giogo:{
-
- name:"Passo del Giogo",
-
- color:"#16C784",
-
- altitude:"882 m",
-
- road:"SP503",
-
- summit:[44.0020,11.3880],
-
- waypoints:[
-
-  [43.9910,11.3540],
-
-  [44.0020,11.3880],
-
-  [44.1100,11.3780]
-
- ]
-
-},
-
-muraglione:{
-
- name:"Passo del Muraglione",
-
- color:"#9B5CFF",
-
- altitude:"907 m",
-
- road:"SS67",
-
- summit:[43.9410,11.6560],
-
- waypoints:[
-
-  [43.8640,11.6190],
-
-  [43.9410,11.6560],
-
-  [44.0400,11.7440]
-
- ]
-
-}
-
+  muraglione:{
+    name:"Passo del Muraglione",
+    color:"#9B5CFF",
+    altitude:"907 m",
+    road:"SS67",
+    summit:[43.9410,11.6560],
+    waypoints:[
+      [43.8640,11.6190],
+      [43.9410,11.6560],
+      [44.0400,11.7440]
+    ]
+  }
 };
 
 const layers={};
 
-/*
+const futaRaticosaRoute={
+  name:"Passo Futa–Raticosa",
+  color:"#00C853",
+  road:"SS65",
+  waypoints:[
+    [44.3897,11.3448],
+    [44.2990,11.3318],
+    [44.2684,11.3279],
+    [44.2194,11.3175],
+    [44.1510,11.3370],
+    [44.1270,11.2710],
+    [44.0962,11.2753],
+    [44.0520,11.2860],
+    [43.9997,11.2367]
+  ]
+};
 
- Converte i punti nel formato richiesto da OSRM:
+const focusBounds={
+  raticosa:L.latLngBounds([
+    [44.2194,11.3175],
+    [44.1510,11.3370],
+    [44.1270,11.2710]
+  ]),
 
- longitudine,latitudine
-
-*/
+  futa:L.latLngBounds([
+    [44.1270,11.2710],
+    [44.0962,11.2753],
+    [44.0520,11.2860]
+  ])
+};
 
 function waypointString(points){
-
- return points.map(p =>
-
-   p[1] + "," + p[0]
-
- ).join(";");
-
+  return points.map(function(point){
+    return point[1]+","+point[0];
+  }).join(";");
 }
 
-/*
+function navigationLink(position){
+  return "https://www.google.com/maps/search/?api=1&query="+
+    position[0]+","+position[1];
+}
 
- Scarica la geometria reale del percorso stradale.
+function passPopup(pass){
+  return "<b>"+pass.name+"</b><br>"+
+    pass.altitude+" • "+pass.road+
+    "<br><a class='btn' target='_blank' href='"+
+    navigationLink(pass.summit)+"'>Apri navigazione</a>";
+}
 
-*/
+async function loadRoute(id,pass){
+  const coordinates=waypointString(pass.waypoints);
 
-async function loadRoute(id,p){
+  const url=
+    "https://router.project-osrm.org/route/v1/driving/"+
+    coordinates+
+    "?overview=full&geometries=geojson";
 
- const coords=waypointString(p.waypoints);
+  let latlngs=pass.waypoints;
 
- const url=
+  try{
+    const response=await fetch(url);
 
- "https://router.project-osrm.org/route/v1/driving/"
-
- +coords+
-
- "?overview=full&geometries=geojson";
-
- try{
-
-  const response=await fetch(url);
-
-  if(!response.ok){
-
-   throw new Error("Routing non disponibile");
-
-  }
-
-  const data=await response.json();
-
-  if(!data.routes || !data.routes.length){
-
-   throw new Error("Percorso non trovato");
-
-  }
-
-  const geometry=data.routes[0].geometry.coordinates;
-
-  const latlngs=geometry.map(c=>[c[1],c[0]]);
-
-  const line=L.polyline(
-
-    latlngs,
-
-    {
-
-      color:p.color,
-
-      weight:7,
-
-      opacity:.92
-
+    if(!response.ok){
+      throw new Error("Routing non disponibile");
     }
 
+    const data=await response.json();
+
+    if(!data.routes || !data.routes.length){
+      throw new Error("Percorso non trovato");
+    }
+
+    latlngs=data.routes[0].geometry.coordinates.map(function(coordinate){
+      return [coordinate[1],coordinate[0]];
+    });
+
+  }catch(error){
+    console.log(error);
+  }
+
+  const line=L.polyline(
+    latlngs,
+    {
+      color:pass.color,
+      weight:7,
+      opacity:.92
+    }
   ).addTo(map);
 
   const marker=L.circleMarker(
-
-    p.summit,
-
+    pass.summit,
     {
-
       radius:8,
-
       color:"#fff",
-
       weight:2,
-
-      fillColor:p.color,
-
+      fillColor:pass.color,
       fillOpacity:1
-
     }
-
   ).addTo(map);
 
-  const maps=
-
-   "https://www.google.com/maps/search/?api=1&query="
-
-   +p.summit[0]+","+p.summit[1];
-
-  const popup=
-
-   "<b>"+p.name+"</b><br>"+
-
-   p.altitude+" • "+p.road+
-
-   "<br><a class='btn' target='_blank' href='"+maps+"'>"+
-
-   "Apri navigazione</a>";
+  const popup=passPopup(pass);
 
   line.bindPopup(popup);
-
   marker.bindPopup(popup);
 
   layers[id]=L.featureGroup([line,marker]);
-
- }
-
- catch(error){
-
-  console.log(error);
-
- }
-
 }
 
-/*
+async function loadFutaRaticosa(){
+  const route=futaRaticosaRoute;
+  const coordinates=waypointString(route.waypoints);
 
- Caricamento dei quattro passi.
+  const url=
+    "https://router.project-osrm.org/route/v1/driving/"+
+    coordinates+
+    "?overview=full&geometries=geojson";
 
-*/
+  let latlngs=route.waypoints;
+
+  try{
+    const response=await fetch(url);
+
+    if(!response.ok){
+      throw new Error("Routing non disponibile");
+    }
+
+    const data=await response.json();
+
+    if(!data.routes || !data.routes.length){
+      throw new Error("Percorso non trovato");
+    }
+
+    latlngs=data.routes[0].geometry.coordinates.map(function(coordinate){
+      return [coordinate[1],coordinate[0]];
+    });
+
+  }catch(error){
+    console.log(error);
+  }
+
+  const line=L.polyline(
+    latlngs,
+    {
+      color:route.color,
+      weight:7,
+      opacity:.92
+    }
+  ).addTo(map);
+
+  line.bindPopup(
+    "<b>Passo Futa–Raticosa</b><br>"+
+    "Pianoro Vecchio → Barberino di Mugello<br>"+
+    "SS65 • circa 50 km"
+  );
+
+  ["raticosa","futa"].forEach(function(id){
+    const pass=passes[id];
+
+    const marker=L.circleMarker(
+      pass.summit,
+      {
+        radius:8,
+        color:"#fff",
+        weight:2,
+        fillColor:route.color,
+        fillOpacity:1
+      }
+    ).addTo(map);
+
+    marker.bindPopup(passPopup(pass));
+    layers[id]=marker;
+  });
+
+  map.fitBounds(line.getBounds(),{padding:[45,45]});
+}
 
 async function loadAll(){
+  const status=document.getElementById("status");
 
- const status=document.getElementById("status");
+  status.innerHTML="Caricamento: Passo Futa–Raticosa…";
+  await loadFutaRaticosa();
 
- for(const [id,p] of Object.entries(passes)){
+  for(const id of ["giogo","muraglione"]){
+    const pass=passes[id];
 
-   status.innerHTML="Caricamento: "+p.name+"…";
+    status.innerHTML="Caricamento: "+pass.name+"…";
+    await loadRoute(id,pass);
+  }
 
-   await loadRoute(id,p);
-
- }
-
- status.innerHTML=
-
- "Tocca un passo per ingrandire il percorso.";
-
+  status.innerHTML="Tocca un passo per ingrandire il percorso.";
 }
 
 function focusPass(id){
+  if(focusBounds[id]){
+    map.fitBounds(
+      focusBounds[id],
+      {padding:[45,45]}
+    );
 
- if(layers[id]){
+    if(layers[id]){
+      layers[id].openPopup();
+    }
 
-   map.fitBounds(
-
-     layers[id].getBounds(),
-
-     {padding:[45,45]}
-
-   );
-
- }
-
+  }else if(layers[id]){
+    map.fitBounds(
+      layers[id].getBounds(),
+      {padding:[45,45]}
+    );
+  }
 }
 
 loadAll();
-
 </script>
 
 </body>
-
 </html>
