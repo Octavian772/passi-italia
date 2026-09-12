@@ -153,7 +153,21 @@ L.tileLayer(
     attribution:"© OpenStreetMap contributors"
   }
 ).addTo(map);
-const passes={
+LL.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
+  {
+    maxZoom:19,
+    opacity:0.9
+  }
+).addTo(map);
+
+L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+  {
+    maxZoom:19,
+    opacity:1
+  }
+).addTo(map);const passes={
 
   futa:{
     name:"Passo della Futa",
