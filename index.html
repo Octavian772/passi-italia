@@ -147,7 +147,7 @@ body{
 const map=L.map("map").setView([44.05,11.43],10);
 
 L.tileLayer(
-  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   {
     maxZoom:19,
     attribution:"© OpenStreetMap contributors"
