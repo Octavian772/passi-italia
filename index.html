@@ -159,12 +159,6 @@ const roadLayer=L.tileLayer(
     maxZoom:19,
     opacity:1
   }
-const roadLayer=L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
-  {
-    maxZoom:19,
-    opacity:1
-  }
 );
 
 roadLayer.on("tileload",function(event){
@@ -174,26 +168,15 @@ roadLayer.on("tileload",function(event){
 
 roadLayer.addTo(map);
 
-roadLayer.on("tileload",function(event){
-  event.tile.style.filter=
-    "hue-rotate(95deg) saturate(1.7) brightness(1.15)";
-});
-
-roadLayer.addTo(map);
-  "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
-  {
-    maxZoom:19,
-    opacity:0.9
-  }
-).addTo(map);
-
 L.tileLayer(
   "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
   {
     maxZoom:19,
     opacity:1
   }
-).addTo(map);const passes={
+).addTo(map);
+
+const passes={
 
   futa:{
     name:"Passo della Futa",
